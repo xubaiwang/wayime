@@ -13,15 +13,27 @@
       system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        common = with pkgs; {
-          buildInputs = [
-            wayland
-            librime
-            libxkbcommon
-          ];
-          RIME_INCLUDE_DIR = "${librime}/include";
-          RIME_LIB_DIR = "${librime}/lib";
-        };
+        makeCommon =
+          with pkgs;
+          {
+            devShell ? false,
+            rimeDataPkg ? rime-data,
+          }:
+          {
+            buildInputs = [
+              wayland
+              librime
+              libxkbcommon
+              rimeDataPkg
+            ];
+            nativeBuildInputs = lib.optionals devShell [
+              pkg-config
+              rustPlatform.bindgenHook
+            ];
+            RIME_INCLUDE_DIR = "${librime}/include";
+            RIME_LIB_DIR = "${librime}/lib";
+            RIME_SHARED_DATA_DIR = "${rimeDataPkg}/share/rime-data";
+          };
       in
       {
         # 包
@@ -38,12 +50,8 @@
                   "rime-api-0.1.0" = "sha256-VUhvKzC6sgPJidQ9bMLJvu3xZYqkThvGzzVsJUqn0rw=";
                 };
               };
-              nativeBuildInputs = [
-                pkg-config
-                rustPlatform.bindgenHook
-              ];
             }
-            // common
+            // makeCommon { }
           );
 
         # 開發環境
@@ -57,8 +65,8 @@
                 rustPlatform.bindgenHook
               ];
             }
-            // common
+            // makeCommon { devShell = true; }
           );
-      } 
+      }
     );
 }
