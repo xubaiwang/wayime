@@ -8,11 +8,11 @@ use super::Im;
 impl Dispatch<ZwpInputMethodV2, ()> for Im {
     fn event(
         im: &mut Self,
-        proxy: &ZwpInputMethodV2,
+        _: &ZwpInputMethodV2,
         event: <ZwpInputMethodV2 as wayland_client::Proxy>::Event,
-        data: &(),
-        conn: &wayland_client::Connection,
-        qhandle: &QueueHandle<Self>,
+        _: &(),
+        _: &wayland_client::Connection,
+        _: &QueueHandle<Self>,
     ) {
         match event {
             Event::Activate => {
@@ -21,17 +21,13 @@ impl Dispatch<ZwpInputMethodV2, ()> for Im {
             Event::Deactivate => {
                 im.handle_reset();
             }
-            Event::SurroundingText {
-                text,
-                cursor,
-                anchor,
-            } => {
+            Event::SurroundingText { .. } => {
                 // noop
             }
-            Event::TextChangeCause { cause } => {
+            Event::TextChangeCause { .. } => {
                 // noop
             }
-            Event::ContentType { hint, purpose } => {
+            Event::ContentType { .. } => {
                 // noop
             }
             Event::Done => {

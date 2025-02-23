@@ -94,7 +94,7 @@ impl Im {
     }
 
     /// 處理按鍵事件。
-    fn handle_key(&mut self, serial: u32, _time: u32, key: u32, key_state: WEnum<KeyState>) {
+    fn handle_key(&mut self, _serial: u32, _time: u32, key: u32, key_state: WEnum<KeyState>) {
         let Some(state) = &self.state else { return };
         // xkb 轉換
         let keycode = Keycode::new(key + 8);
@@ -185,7 +185,7 @@ impl Im {
     }
 
     /// 處理重複。
-    fn handle_repeat(&mut self, rate: i32, delay: i32) {
+    fn handle_repeat(&mut self, _rate: i32, _delay: i32) {
         // TODO: handle repeat
     }
 
@@ -211,31 +211,27 @@ impl Im {
         // 從 Rime 獲取候選詞
         let cand = self.engine.candidate();
         for i in 0..cand.num_candidates {
-            // 是否高亮
-            // let highlighted = i == cand.highlighted_candidate_index;
-            // 間隔
-            buf.push(' ');
-            // if highlighted {
-            //     buf.push('[');
-            // }
+            // 編號或者高亮
+            if i == cand.highlighted_candidate_index {
+                buf.push('⁺');
+            } else {
+                buf.push_str(&map_digits(i));
+            }
             // 候選詞
             buf.push_str(&self.engine.candidate_get(i).unwrap_or("".to_string()));
-            // if highlighted {
-            //     buf.push(']');
-            // }
         }
 
         // 發送設置請求
-        self.set_preedit_string(buf);
+        self.set_preedit_string(buf, preedit.start, preedit.end);
     }
 
     /// 設置预编辑文本。
-    fn set_preedit_string(&self, text: String) {
+    fn set_preedit_string(&self, text: String, start: i32, end: i32) {
         info!("Set preedit string: {}", text);
         self.input_method
             .as_ref()
             .unwrap()
-            .set_preedit_string(text, 0, 0);
+            .set_preedit_string(text, start, end);
     }
 
     /// 提交文本。
@@ -251,4 +247,26 @@ fn time_ms() -> u32 {
         .duration_since(UNIX_EPOCH)
         .unwrap()
         .as_millis() as u32
+}
+
+/// 映射數位。
+fn map_digits(number: i32) -> String {
+    number
+        .to_string()
+        .chars()
+        .map(|c| match c {
+            '0' => '¹',
+            '1' => '²',
+            '2' => '³',
+            '3' => '⁴',
+            '4' => '⁵',
+            '5' => '⁶',
+            '6' => '⁷',
+            '7' => '⁸',
+            '8' => '⁹',
+            '9' => '⁰',
+            '-' => '⁻',
+            c => c,
+        })
+        .collect::<String>()
 }

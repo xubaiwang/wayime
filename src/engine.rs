@@ -1,3 +1,4 @@
+use log::info;
 use ouroboros::self_referencing;
 use rime_api::{Rime, Session, Traits};
 use xkbcommon::xkb;
@@ -35,7 +36,9 @@ impl Engine {
 
         // setup, initialize and maintain
         api.setup(&mut traits);
-        // api.set_notification_handler(|session_id, ty, value| println!("{session_id} {ty} {value}"));
+        api.set_notification_handler(|session_id, ty, value| {
+            info!("Handle notification: {session_id} {ty} {value}")
+        });
         api.initialize(&mut traits);
         api.start_maintenance(true);
         api.join_maintenance_thread();
@@ -49,6 +52,7 @@ impl Engine {
         Self(inner)
     }
 
+    /// 獲取會話。
     pub fn session(&self) -> &Session {
         self.0.borrow_session()
     }
@@ -58,16 +62,10 @@ impl Engine {
         let composition = context.composition();
         let start = composition.sel_start();
         let end = composition.sel_end();
-        let cursor = composition.cursor_pos();
         let text = composition
             .preedit()
             .map(|result| result.unwrap().to_string());
-        Preedit {
-            start,
-            end,
-            cursor,
-            text,
-        }
+        Preedit { start, end, text }
     }
 
     pub fn key(&mut self, key: xkb::Keysym, mods: xkb::ModMask) -> bool {
@@ -80,10 +78,10 @@ impl Engine {
         let context = self.session().context();
         let menu = context.menu();
         let highlighted_candidate_index = menu.highlighted_candidate_index();
-        let page_no = menu.page_no();
+        // let page_no = menu.page_no();
         let num_candidates = menu.num_candidates();
         CandidateInfo {
-            page_no,
+            // page_no,
             highlighted_candidate_index,
             num_candidates,
         }
@@ -106,11 +104,11 @@ impl Engine {
         commit.text().map(|res| res.unwrap().to_string())
     }
 
+    /// 切換 ASCII 模式。
     pub fn toggle(&mut self) {
         let session = self.session();
-        session
-            .set_option("ascii_mode", !session.get_option("ascii_mode").unwrap())
-            .unwrap();
+        let ascii_mode = session.get_option_c(c"ascii_mode");
+        session.set_option_c(c"ascii_mode", !ascii_mode);
     }
 
     pub fn reset(&mut self) {
@@ -128,12 +126,11 @@ impl Engine {
 pub struct Preedit {
     pub start: i32,
     pub end: i32,
-    pub cursor: i32,
     pub text: Option<String>,
 }
 
 pub struct CandidateInfo {
-    pub page_no: i32,
+    // pub page_no: i32,
     pub highlighted_candidate_index: i32,
     pub num_candidates: i32,
 }
