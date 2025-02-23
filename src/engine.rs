@@ -2,6 +2,7 @@ use ouroboros::self_referencing;
 use rime_api::{Rime, Session, Traits};
 use xkbcommon::xkb;
 
+/// 使用單一會話。
 #[self_referencing]
 struct EngineInner {
     api: Rime,
@@ -19,9 +20,12 @@ impl Engine {
         let api = Rime::new().expect("fail to create api");
 
         // traits
+        let config_dir = dirs::config_dir()
+            .expect("fail to get config dir")
+            .join("wlrime");
         let mut traits = Traits::builder()
             .shared_data_dir("/share/rime-data")
-            .user_data_dir("/home/xubaiw/.config/wlpinyin")
+            .user_data_dir(&config_dir.to_string_lossy())
             .distribution_name("wlrime")
             .distribution_code_name("wlrime")
             .distribution_version("0.1.0")
