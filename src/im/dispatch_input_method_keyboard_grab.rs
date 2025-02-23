@@ -95,15 +95,13 @@ impl Im {
 
     /// 處理按鍵事件。
     fn handle_key(&mut self, _serial: u32, _time: u32, key: u32, key_state: WEnum<KeyState>) {
-        let Some(state) = &self.state else { return };
+        let state = self.state.as_ref().unwrap();
         // xkb 轉換
         let keycode = Keycode::new(key + 8);
         let keysym = state.key_get_one_sym(keycode);
         info!("Handle key: {:?}", keysym);
         // 獲取 key state
-        let WEnum::Value(key_state) = key_state else {
-            return;
-        };
+        let key_state = key_state.into_result().expect("unrecognized key state");
         let pressed = key_state == KeyState::Pressed;
         // TODO: 處理 repeat
         self.handle_key_further(keycode, keysym, pressed);
