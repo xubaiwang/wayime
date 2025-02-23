@@ -26,10 +26,10 @@
               libxkbcommon
               rimeDataPkg
             ];
-            nativeBuildInputs = lib.optionals devShell [
+            nativeBuildInputs = [
               pkg-config
               rustPlatform.bindgenHook
-            ];
+            ] ++ lib.optionals [ rustup ];
             RIME_INCLUDE_DIR = "${librime}/include";
             RIME_LIB_DIR = "${librime}/lib";
             RIME_SHARED_DATA_DIR = "${rimeDataPkg}/share/rime-data";
@@ -57,16 +57,9 @@
         # 開發環境
         devShells.default =
           with pkgs;
-          mkShell (
-            {
-              nativeBuildInputs = [
-                pkg-config
-                rustup
-                rustPlatform.bindgenHook
-              ];
-            }
-            // makeCommon { devShell = true; }
-          );
+          mkShell (makeCommon {
+            devShell = true;
+          });
       }
     );
 }
