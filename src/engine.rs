@@ -44,11 +44,6 @@ impl Engine {
         api.join_maintenance_thread();
 
         let inner = EngineInner::new(api, |api| api.create_session());
-
-        // schema
-        // TODO: list schema
-        inner.borrow_session().select_schema("yustar").unwrap();
-
         Self(inner)
     }
 
