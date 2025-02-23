@@ -29,7 +29,7 @@
             nativeBuildInputs = [
               pkg-config
               rustPlatform.bindgenHook
-            ] ++ lib.optionals [ rustup ];
+            ] ++ lib.optionals devShell [ rustup ];
             RIME_INCLUDE_DIR = "${librime}/include";
             RIME_LIB_DIR = "${librime}/lib";
             RIME_SHARED_DATA_DIR = "${rimeDataPkg}/share/rime-data";
