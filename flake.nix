@@ -67,6 +67,9 @@
           mkShell (makeCommon {
             devShell = true;
           });
+        # shellHook = ''
+        #   export NIX_LDFLAGS="''${NIX_LDFLAGS/-rpath $out\/lib /}"
+        # ''
       }
     );
 }

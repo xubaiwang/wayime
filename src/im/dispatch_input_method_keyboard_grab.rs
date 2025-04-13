@@ -1,5 +1,4 @@
 use std::{
-    cell::Cell,
     os::fd::{AsFd, OwnedFd},
     time::{SystemTime, UNIX_EPOCH},
 };
@@ -109,9 +108,8 @@ impl Im {
 
     /// 進一步處理
     fn handle_key_further(&mut self, keycode: Keycode, keysym: Keysym, pressed: bool) {
-        let state = self.state.as_mut().unwrap();
         // 更新 state
-        state.update_key(
+        self.state.as_mut().unwrap().update_key(
             keycode,
             if pressed {
                 KeyDirection::Down
@@ -121,7 +119,7 @@ impl Im {
         );
         let mut handled = false;
         // toggle
-        if !handled && Self::should_toggle(&self.records, keysym, pressed) {
+        if !handled && self.should_toggle(keysym, pressed) {
             self.engine.toggle();
             handled = true;
         }
@@ -130,7 +128,10 @@ impl Im {
             // 發送按鍵信息到 Rime
             handled = self.engine.key(
                 keysym,
-                state.serialize_mods(XKB_STATE_MODS_EFFECTIVE | XKB_STATE_LAYOUT_EFFECTIVE),
+                self.state
+                    .as_mut()
+                    .unwrap()
+                    .serialize_mods(XKB_STATE_MODS_EFFECTIVE | XKB_STATE_LAYOUT_EFFECTIVE),
             );
         }
         // bypass 模式
@@ -188,12 +189,12 @@ impl Im {
     }
 
     /// 是否應該更改狀態。
-    fn should_toggle(records: &[Cell<Option<Keysym>>; 2], key: Keysym, pressed: bool) -> bool {
-        records[1].set(records[0].get());
-        records[0].set(Some(key));
+    fn should_toggle(&mut self, key: Keysym, pressed: bool) -> bool {
+        let prev = self.records[0].replace(key);
+        self.records[1] = prev;
         return pressed == false
-            && records[0].get() == Some(Keysym::XF86_Keyboard)
-            && records[1].get() == Some(Keysym::XF86_Keyboard);
+            && self.records[0] == Some(self.config.switch_key)
+            && self.records[1] == Some(self.config.switch_key);
     }
 
     /// 更新預編輯文本面板。

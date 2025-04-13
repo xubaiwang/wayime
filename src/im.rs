@@ -1,5 +1,3 @@
-use std::cell::Cell;
-
 use wayland_client::protocol::wl_seat::WlSeat;
 use wayland_protocols_misc::{
     zwp_input_method_v2::client::{
@@ -14,7 +12,7 @@ use wayland_protocols_misc::{
 };
 use xkbcommon::xkb::{self, Keysym};
 
-use crate::engine::Engine;
+use crate::{engine::Engine, Config};
 
 mod dispatch_input_method;
 mod dispatch_input_method_keyboard_grab;
@@ -25,6 +23,7 @@ mod dispatch_virtual_keyboard;
 mod dispatch_virtual_keyboard_manager;
 
 pub struct Im {
+    config: Config,
     // rime
     engine: Engine,
     // xkb
@@ -40,16 +39,16 @@ pub struct Im {
     virtual_keyboard_manager: Option<ZwpVirtualKeyboardManagerV1>,
     virtual_keyboard: Option<ZwpVirtualKeyboardV1>,
     // records
-    records: [Cell<Option<Keysym>>; 2],
+    records: [Option<Keysym>; 2],
     // serial
     serial: u32,
 }
 
 impl Im {
-    pub fn new() -> Self {
+    pub fn new(config: Config) -> Self {
         let engine = Engine::new();
         let context = xkb::Context::new(0);
-        let records = [Cell::new(None), Cell::new(None)];
+        let records = [None; 2];
         let serial = 0;
         let im = Self {
             engine,
@@ -63,6 +62,7 @@ impl Im {
             virtual_keyboard: None,
             records,
             serial,
+            config,
         };
         im
     }
