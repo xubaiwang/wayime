@@ -20,6 +20,11 @@
             rimeDataPkg ? rime-data,
           }:
           {
+            packages = [
+              rust-analyzer
+              clippy
+              rustfmt
+            ];
             buildInputs = [
               wayland
               librime
@@ -28,6 +33,8 @@
             ];
             nativeBuildInputs = [
               pkg-config
+              rustc
+              cargo
               rustPlatform.bindgenHook
             ] ++ lib.optionals devShell [ rustup ];
             RIME_INCLUDE_DIR = "${librime}/include";

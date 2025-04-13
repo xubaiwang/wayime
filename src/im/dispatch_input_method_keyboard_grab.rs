@@ -192,8 +192,8 @@ impl Im {
         records[1].set(records[0].get());
         records[0].set(Some(key));
         return pressed == false
-            && records[0].get() == Some(Keysym::Shift_L)
-            && records[1].get() == Some(Keysym::Shift_L);
+            && records[0].get() == Some(Keysym::XF86_Keyboard)
+            && records[1].get() == Some(Keysym::XF86_Keyboard);
     }
 
     /// 更新預編輯文本面板。
