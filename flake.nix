@@ -13,37 +13,28 @@
       system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        makeCommon =
-          with pkgs;
-          {
-            devShell ? false,
-            rimeDataPkg ? rime-data,
-          }:
-          {
-            packages = [
-              rust-analyzer
-              clippy
-              rustfmt
-            ];
-            buildInputs = [
-              wayland
-              librime
-              libxkbcommon
-              rimeDataPkg
-            ];
-            nativeBuildInputs = [
-              pkg-config
-              rustc
-              cargo
-              rustPlatform.bindgenHook
-            ] ++ lib.optionals devShell [ rustup ];
-            RIME_INCLUDE_DIR = "${librime}/include";
-            RIME_LIB_DIR = "${librime}/lib";
-            RIME_SHARED_DATA_DIR = "${rimeDataPkg}/share/rime-data";
-          };
+        # rime related environemnt variables
+        rimeEnvs = with pkgs; {
+          RIME_INCLUDE_DIR = "${librime}/include";
+          RIME_LIB_DIR = "${librime}/lib";
+          RIME_SHARED_DATA_DIR = "${rime-data}/share/rime-data";
+        };
+        buildInputs = with pkgs; [
+          wayland
+          librime
+          libxkbcommon
+          rime-data
+        ];
+        nativeBuildInputs = with pkgs; [
+          pkg-config
+          rustc
+          cargo
+          rustPlatform.bindgenHook
+        ];
       in
       {
-        # 包
+
+        # 打包
         packages.default =
           with pkgs;
           rustPlatform.buildRustPackage (
@@ -53,23 +44,33 @@
               src = ./.;
               cargoLock = {
                 lockFile = ./Cargo.lock;
-                outputHashes = {
-                  "rime-api-0.1.0" = "sha256-VUhvKzC6sgPJidQ9bMLJvu3xZYqkThvGzzVsJUqn0rw=";
-                };
               };
+
+              inherit buildInputs nativeBuildInputs;
             }
-            // makeCommon { }
+            // rimeEnvs
           );
 
-        # 開發環境
+        # 开发环境
         devShells.default =
           with pkgs;
-          mkShell (makeCommon {
-            devShell = true;
-          });
-        # shellHook = ''
-        #   export NIX_LDFLAGS="''${NIX_LDFLAGS/-rpath $out\/lib /}"
-        # ''
+          mkShell (
+            {
+              packages = [
+                rust-analyzer
+                clippy
+                rustfmt
+              ];
+
+              inherit buildInputs nativeBuildInputs;
+
+              # In case path contains space
+              shellHook = ''
+                export NIX_LDFLAGS="''${NIX_LDFLAGS/-rpath $out\/lib /}"
+              '';
+            }
+            // rimeEnvs
+          );
       }
     );
 }
