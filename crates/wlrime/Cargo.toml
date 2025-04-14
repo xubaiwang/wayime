@@ -12,7 +12,7 @@ librime-sys = "0.4.0"
 log = "0.4.26"
 ouroboros = "0.18.5"
 paste = "1.0.15"
-rime-api = { git = "https://github.com/xubaiwang/rime-api-rs", version = "0.1.0" }
+rime-api = { path = "../rime-api-rs" }
 serde = { version = "1.0.219", features = ["derive"] }
 wayland-client = "0.31.8"
 wayland-protocols = "0.32.6"
