@@ -1,20 +1,3 @@
-[package]
-name = "wlrime"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-bon = "3.3.2"
-dirs = "6.0.0"
-env_logger = "0.11.6"
-figment = { version = "0.10.19", features = ["toml"] }
-librime-sys = "0.4.0"
-log = "0.4.26"
-ouroboros = "0.18.5"
-paste = "1.0.15"
-rime-api = { git = "https://github.com/xubaiwang/rime-api-rs", version = "0.1.0" }
-serde = { version = "1.0.219", features = ["derive"] }
-wayland-client = "0.31.8"
-wayland-protocols = "0.32.6"
-wayland-protocols-misc = { version = "0.3.6", features = ["client"] }
-xkbcommon = "0.8.0"
+[workspace]
+resolver = "2"
+members = [ "crates/wlrime" ]
