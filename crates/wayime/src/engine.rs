@@ -24,15 +24,15 @@ impl Engine {
         let shared_data_dir = option_env!("RIME_SHARED_DATA_DIR").unwrap_or("/usr/share/rime-data");
         let config_dir = dirs::config_dir()
             .expect("fail to get config dir")
-            .join("wlrime")
+            .join("wayime")
             .join("rime");
         let mut traits = Traits::builder()
             .shared_data_dir(shared_data_dir)
             .user_data_dir(&config_dir.to_string_lossy())
-            .distribution_name("wlrime")
-            .distribution_code_name("wlrime")
+            .distribution_name("wayime")
+            .distribution_code_name("wayime")
             .distribution_version("0.1.0")
-            .app_name("rime.wlrime")
+            .app_name("rime.wayime")
             .build()
             .expect("fail to build traits");
 

@@ -17,7 +17,7 @@ fn main() {
     // load config
     let config_file = dirs::config_dir()
         .expect("fail to get config dir")
-        .join("wlrime")
+        .join("wayime")
         .join("config.toml");
     let config: Config = Figment::new()
         .merge(Toml::file(config_file))

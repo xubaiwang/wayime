@@ -1,3 +1,3 @@
 [workspace]
 resolver = "2"
-members = ["crates/wlrime", "crates/rime-api-rs"]
+members = ["crates/wayime", "crates/rime-api-rs"]

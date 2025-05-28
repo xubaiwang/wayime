@@ -1,4 +1,4 @@
-# WlRime
+# wayime
 
 Inspired by [wlpinyin](https://github.com/xhebox/wlpinyin).
 
@@ -7,20 +7,20 @@ Inspired by [wlpinyin](https://github.com/xhebox/wlpinyin).
 ### Nix
 
 ```bash
-nix run github:xubaiwang/wlrime
+nix run github:xubaiwang/wayime
 ```
 
 ### Compile from source
 
 ```bash
-cargo install --git https://github.com/xubaiwang/wlrime
+cargo install --git https://github.com/xubaiwang/wayime
 ```
 
 ## Configuration
 
-The configuration file is `$HOME/.config/wlrime/config.toml`.
+The configuration file is `$HOME/.config/wayime/config.toml`.
 
-And the user rime data dir is `$HOME/.config/wlrime/rime`.
+And the user rime data dir is `$HOME/.config/wayime/rime`.
 
 ```toml
 # Use XF86_Keyboard in case conflict with other applications.
