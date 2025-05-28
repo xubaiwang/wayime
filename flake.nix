@@ -17,13 +17,11 @@
         rimeEnvs = with pkgs; {
           RIME_INCLUDE_DIR = "${librime}/include";
           RIME_LIB_DIR = "${librime}/lib";
-          RIME_SHARED_DATA_DIR = "${rime-data}/share/rime-data";
         };
         buildInputs = with pkgs; [
           wayland
           librime
           libxkbcommon
-          rime-data
         ];
         nativeBuildInputs = with pkgs; [
           pkg-config
