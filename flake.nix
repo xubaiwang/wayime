@@ -1,18 +1,33 @@
 {
-  description = "Flake utils demo";
+  description = "wayime";
 
-  inputs.flake-utils.url = "github:numtide/flake-utils";
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    rust-overlay.url = "github:oxalica/rust-overlay";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
 
   outputs =
     {
       self,
       nixpkgs,
+      rust-overlay,
       flake-utils,
     }:
     flake-utils.lib.eachDefaultSystem (
       system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ rust-overlay.overlays.default ];
+        };
+
+        toolchain = pkgs.rust-bin.stable.latest.default.override {
+          extensions = [
+            "rust-src"
+            "rust-analyzer"
+          ];
+        };
         # rime related environemnt variables
         rimeEnvs = with pkgs; {
           RIME_INCLUDE_DIR = "${librime}/include";
@@ -25,8 +40,7 @@
         ];
         nativeBuildInputs = with pkgs; [
           pkg-config
-          rustc
-          cargo
+          toolchain
           rustPlatform.bindgenHook
         ];
       in
@@ -54,12 +68,6 @@
           with pkgs;
           mkShell (
             {
-              packages = [
-                rust-analyzer
-                clippy
-                rustfmt
-              ];
-
               inherit buildInputs nativeBuildInputs;
 
               # In case path contains space
